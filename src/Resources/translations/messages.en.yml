@@ -1,0 +1,13 @@
+bthn:
+  amazonpay_plugin:
+    sandbox_env: Environment
+    secure: Production
+    sandbox: Test
+    signature_key: Second configuration key
+    pos_id: Payment point identifier
+    gateway_label: AmazonPay
+    region: Region
+    us: US
+    uk: UK
+    de: DE
+    jp: JP

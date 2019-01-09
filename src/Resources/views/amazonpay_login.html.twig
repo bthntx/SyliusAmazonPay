@@ -1,0 +1,29 @@
+<div id="AmazonPayButton" class="ui center aligned grid padded">
+</div>
+<div class="ui divider"></div>
+
+
+<script type="text/javascript">
+function showButton(){
+        var authRequest;
+        OffAmazonPayments.Button("AmazonPayButton", "{{ settings.resource.merchant_id}}", {
+            type:  "PwA",
+            color: "Gold",
+            size:  "large",
+
+            authorization: function() {
+                loginOptions = {scope: "payments:widget payments:shipping_address",
+                    popup: "true"};
+                authRequest = amazon.Login.authorize (loginOptions,
+                    "http://localhost:8000/en_US/bthn/amzn/auth");
+            },
+
+            onError: function(error) {
+                // your error handling code.
+                // alert("The following error occurred: "
+                //        + error.getErrorCode()
+                //        + ' - ' + error.getErrorMessage());
+            }
+        });
+    };
+</script>

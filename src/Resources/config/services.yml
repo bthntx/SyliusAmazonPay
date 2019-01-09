@@ -1,0 +1,66 @@
+services:
+  bthn.amazonpay_plugin.form.type.gateway_configuration:
+    class: Bthn\SyliusAmazonPayPlugin\Form\Type\AmazonPayGatewayConfigurationType
+    tags:
+    - { name: sylius.gateway_configuration_type, type: amazonpay, label: bthn.amazonpay_plugin.gateway_label }
+    - { name: form.type }
+
+  bthn.amazonpay_plugin.gateway_factory:
+    class: Payum\Core\Bridge\Symfony\Builder\GatewayFactoryBuilder
+    arguments: [Bthn\SyliusAmazonPayPlugin\AmazonPayGatewayFactory]
+    tags:
+    - { name: payum.gateway_factory_builder, factory: amazonpay }
+
+  bthn.amazonpay_plugin.bridge.amazonpay:
+    class: Bthn\SyliusAmazonPayPlugin\Bridge\AmazonPayBridge
+    arguments:
+      - '@sylius.context.channel'
+
+  bthn.amazonpay_plugin.amazonpay_action:
+    class: Bthn\SyliusAmazonPayPlugin\Action\AmazonPayAction
+    public: true
+    arguments: ['@bthn.amazonpay_plugin.bridge.amazonpay', '@payum','@session']
+    tags:
+    - { name: payum.action, factory: amazonpay, alias: payum.action.set_amazonpay }
+
+  bthn.amazonpay_plugin.amazonpay_get_address_action:
+    class: Bthn\SyliusAmazonPayPlugin\Action\AmazonPayGetAddressAction
+    public: true
+    arguments: ['@bthn.amazonpay_plugin.bridge.amazonpay', '@payum']
+    tags:
+    - { name: payum.action, factory: amazonpay, alias: payum.action.get_amazonpay_address }
+
+
+  bthn.amazonpay_plugin.amazonpay_config_action:
+    class: Bthn\SyliusAmazonPayPlugin\Action\AmazonPayConfigAction
+    public: true
+    arguments: [ '@payum']
+    tags:
+    - { name: payum.action, factory: amazonpay, alias: payum.action.get_amazonpay_config }
+
+  bthn.amazonpay_plugin.notify_action:
+    class: Bthn\SyliusAmazonPayPlugin\Action\NotifyAction
+    public: true
+    arguments:
+    - '@bthn.amazonpay_plugin.bridge.amazonpay'
+    tags:
+    - { name: payum.action, factory: amazonpay, alias: payum.action.notify }
+
+  bthn.block_event_listener.checkout.address.before_form:
+    class: Bthn\SyliusAmazonPayPlugin\Sonata\Event\AmazonPayLoginBlock
+    arguments:
+    - '@@BthnSyliusAmazonPayPlugin/amazonpay_login.html.twig'
+    - '@payum'
+    - '@request_stack'
+    tags:
+    - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.cart.summary.after_totals, method: onBlockEvent }
+
+
+  bthn.block_event_listener.checkout.header.js:
+    class: Bthn\SyliusAmazonPayPlugin\Sonata\Event\AmazonPayLoginBlock
+    arguments:
+    - '@@BthnSyliusAmazonPayPlugin/amazonpay_js.html.twig'
+    - '@payum'
+    - '@request_stack'
+    tags:
+    - { name: kernel.event_listener, event: sonata.block.event.sylius.shop.layout.head, method: onHeaderBlockEvent }

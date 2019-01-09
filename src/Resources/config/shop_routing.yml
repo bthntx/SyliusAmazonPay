@@ -1,0 +1,19 @@
+# Delete these routes and define your own shop routes here
+
+bthn_sylius_amazonpay_auth_token:
+    path: /bthn/amzn/auth
+    defaults:
+        _controller: BthnSyliusAmazonPayPlugin:AmazonPay:saveAuthToken
+        name: ~
+
+bthn_sylius_amazonpay_get_order_info:
+    path: /bthn/amzn/getCurrentOrderInfo
+    defaults:
+        _controller: BthnSyliusAmazonPayPlugin:AmazonPay:getCurrentOrderInfo
+        name: ~
+
+bthn_sylius_amazonpay_checkout:
+    path: /chooseAddress
+    defaults:
+        _controller: BthnSyliusAmazonPayPlugin:AmazonPay:selectAmazonAddress
+        name: ~

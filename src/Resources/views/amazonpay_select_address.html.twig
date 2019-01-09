@@ -1,0 +1,117 @@
+{% extends '@SyliusShop/Checkout/layout.html.twig' %}
+
+
+{% block content %}
+    {% include '@SyliusShop/Checkout/_steps.html.twig' %}
+    <!-- Include the following in your  HTML file -->
+    <style type="text/css">
+        #addressBookWidgetDiv {
+            width: 100%;
+            height: 228px;
+        }
+
+        #walletWidgetDiv {
+            width: 100%;
+            height: 228px;
+        }</style>
+
+
+    <div id="addressBookWidgetDiv">
+    </div>
+    <div id="walletWidgetDiv">
+    </div>
+
+    <div>
+
+        <button type="button" id="addressChoosen" class="ui large primary icon labeled button disabled" onclick="dumpAddress()"><i
+                    class="arrow right icon"></i> Next
+        </button>
+    </div>
+
+    <script type="text/javascript">
+        var amazonOrderReferenceId = '';
+
+        function dumpAddress() {
+            document.location = "{{ path("bthn_sylius_amazonpay_get_order_info") }}/?amazonOrderId="+amazonOrderReferenceId;
+        }
+
+        function showButton() {
+            var authRequest;
+            OffAmazonPayments.Button("AmazonPayButton", "{{ settings.merchant_id }}", {
+                type: "LwA",
+                color: "Gold",
+                size: "small",
+
+                authorization: function () {
+                    loginOptions = {
+                        scope: "payments:widget payments:shipping_address",
+                        popup: "true"
+                    };
+                    authRequest = amazon.Login.authorize(loginOptions,
+                        "http://localhost:8000/en_US/bthn/amzn/auth");
+                },
+
+                onError: function (error) {
+                    $('#addressChoosen').addClass('disabled');
+                }
+            });
+        };
+    </script>
+
+    <script type="text/javascript">
+        document.getElementById('Logout').onclick = function () {
+            amazon.Login.logout();
+        };
+    </script>
+
+
+    <script>
+        new OffAmazonPayments.Widgets.AddressBook({
+            sellerId: '{{ settings.merchant_id }}',
+            onOrderReferenceCreate: function (orderReference) {
+                // Here is where you can grab the Order Reference ID.
+                amazonOrderReferenceId = orderReference.getAmazonOrderReferenceId();
+            },
+            onAddressSelect: function (orderReference) {
+                $('#addressChoosen').removeClass('disabled');
+            },
+            design: {
+                designMode: 'responsive'
+            },
+            onReady: function (orderReference) {
+                // Enter code here that you want to be executed
+                // when the address widget has been rendered.
+            },
+
+            onError: function (error) {
+                // Your error handling code.
+                // During development you can use the following
+                // code to view error messages:
+                // console.log(error.getErrorCode() + ': ' + error.getErrorMessage());
+                // See "Handling Errors" for more information.
+                $('#addressChoosen').addClass('disabled');
+            }
+        }).bind("addressBookWidgetDiv");
+    </script>
+
+
+    <script>
+        new OffAmazonPayments.Widgets.Wallet({
+            sellerId: '{{ settings.merchant_id }}',
+            onPaymentSelect: function (orderReference) {
+
+            },
+            design: {
+                designMode: 'responsive'
+            },
+
+            onError: function (error) {
+                // Your error handling code.
+                // During development you can use the following
+                // code to view error messages:
+                // console.log(error.getErrorCode() + ': ' + error.getErrorMessage());
+                // See "Handling Errors" for more information.
+            }
+        }).bind("walletWidgetDiv");
+    </script>
+{% endblock %}
